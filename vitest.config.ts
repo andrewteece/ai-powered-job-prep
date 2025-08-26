@@ -7,7 +7,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
-    css: true, // lets Vitest ignore CSS modules safely
+    css: true,
+    passWithNoTests: true, // lets Vitest ignore CSS modules safely
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

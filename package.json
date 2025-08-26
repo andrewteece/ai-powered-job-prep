@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "test": "vitest",
     "test:ci": "vitest run",
     "test:ui": "vitest --ui",
@@ -48,7 +48,7 @@
       "prettier --write"
     ],
     "*.{ts,tsx,js,jsx}": [
-      "pnpm lint -f unix --max-warnings=0"
+      "eslint --fix --max-warnings=0"
     ]
   }
 }
