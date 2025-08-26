@@ -13,17 +13,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Install pnpm first
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: true
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck
         run: pnpm typecheck
@@ -32,14 +35,12 @@ jobs:
         run: pnpm lint
 
       - name: Test
-        run: pnpm test -- --run
+        run: pnpm test:ci
 
-      # New: Build just like Vercel
       - name: Build
         env:
-          # If your Next build needs env vars, add them in repo settings → Secrets and variables → Actions,
-          # then reference them here, e.g.:
+          NEXT_TELEMETRY_DISABLED: '1'
+          # If you need secrets for build (like OPENAI_API_KEY, DATABASE_URL):
           # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_TELEMETRY_DISABLED: '1'
         run: pnpm build
