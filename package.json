@@ -6,11 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "next lint",
     "test": "vitest",
+    "test:ci": "vitest run",
     "test:ui": "vitest --ui",
     "test:cov": "vitest --coverage",
-    "prepare": "husky"
+    "coverage": "vitest run --coverage",
+    "check": "pnpm typecheck && pnpm lint && pnpm test:ci",
+    "prepare": "husky",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "next": "15.5.1-canary.9",
