@@ -1,0 +1,18 @@
+# Builds / deps
+node_modules
+.next
+out
+dist
+coverage
+
+# Logs
+*.log
+
+# Misc
+pnpm-lock.yaml
+.DS_Store
+
+# Generated
+.next/
+drizzle/
+.next/types/
