@@ -43,7 +43,7 @@
       "prettier --write"
     ],
     "*.{ts,tsx,js,jsx}": [
-      "pnpm lint -f unix --max-warnings=0"
+      "eslint --fix --max-warnings=0"
     ]
   }
 }
