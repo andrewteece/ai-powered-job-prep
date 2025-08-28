@@ -16,3 +16,4 @@ pnpm-lock.yaml
 .next/
 drizzle/
 .next/types/
+next-env.d.ts

@@ -5,6 +5,13 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -13,21 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install pnpm first (adds it to PATH)
+      # Install pnpm so it's on PATH
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
-      # Setup Node, with caching enabled for pnpm
+      # Setup Node with pnpm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
 
-      # Install deps
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -40,7 +46,11 @@ jobs:
       - name: Test
         run: pnpm test:ci
 
+      # Build needs Clerk keys to avoid prerender failure
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          # Ensure CLERK_SECRET_KEY is set in your repository's GitHub Actions secrets
         run: pnpm build

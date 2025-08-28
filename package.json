@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src --max-warnings=0",
+    "lint:all": "eslint . --max-warnings=0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest",
     "test:ci": "vitest run",
@@ -16,6 +17,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.31.6",
     "next": "15.5.1-canary.9",
     "react": "19.1.0",
     "react-dom": "19.1.0"
