@@ -15,6 +15,9 @@ concurrency:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      # Repo secret (publishable key is safe to expose to build)
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
     steps:
       - name: Checkout
@@ -44,12 +47,7 @@ jobs:
       - name: Test
         run: pnpm test:ci
 
-      # Fail early if the publishable key isn't provided
       - name: Check Clerk env
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          # If you used GitHub "Variables" instead of "Secrets", replace the line above with:
-          # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         run: |
           if [ -z "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:-}" ]; then
             echo "❌ Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"; exit 1;
@@ -57,10 +55,18 @@ jobs:
             echo "✅ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY present";
           fi
 
+      # 🔥 Cache Next.js build artifacts (speeds up builds a lot)
+      - name: Cache Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            next-cache-${{ runner.os }}-
+
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          # If you used "Variables" instead:
-          # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          # already available from job env, but pass explicitly for clarity:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         run: pnpm build
