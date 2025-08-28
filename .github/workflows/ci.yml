@@ -20,14 +20,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install pnpm so it's on PATH
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
-      # Setup Node with pnpm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -46,11 +44,23 @@ jobs:
       - name: Test
         run: pnpm test:ci
 
-      # Build needs Clerk keys to avoid prerender failure
+      # Fail early if the publishable key isn't provided
+      - name: Check Clerk env
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          # If you used GitHub "Variables" instead of "Secrets", replace the line above with:
+          # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:-}" ]; then
+            echo "❌ Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"; exit 1;
+          else
+            echo "✅ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY present";
+          fi
+
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          # Ensure CLERK_SECRET_KEY is set in your repository's GitHub Actions secrets
+          # If you used "Variables" instead:
+          # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         run: pnpm build
