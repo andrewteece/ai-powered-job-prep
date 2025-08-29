@@ -17,6 +17,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@arcjet/inspect": "1.0.0-beta.10",
+    "@arcjet/next": "1.0.0-beta.10",
     "@clerk/nextjs": "^6.31.6",
     "next": "15.5.1-canary.9",
     "react": "19.1.0",

@@ -1,6 +1,9 @@
+// src/middleware.ts
+import { NextResponse } from 'next/server';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import arcjet, { shield, slidingWindow /* or tokenBucket */ } from '@arcjet/next';
 
-// Only gate the routes that should require auth
+// 1) Define which routes require authentication
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/settings(.*)',
@@ -8,17 +11,41 @@ const isProtectedRoute = createRouteMatcher([
   '/api/private(.*)',
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    const session = await auth();
-    if (!session.isAuthenticated) {
-      const signInUrl = `/sign-in?redirect_url=${encodeURIComponent(req.url)}`;
-      return Response.redirect(signInUrl);
-    }
-  }
+// 2) Single Arcjet client (created once per edge runtime boot)
+const aj = arcjet({
+  key: process.env.ARCJET_KEY!,
+  rules: [
+    // Basic security checks (WAF-like)
+    shield({ mode: 'LIVE' }),
+
+    // Simple rate limiting by IP (e.g., 20 req per minute, windowed)
+    slidingWindow({
+      mode: 'LIVE', // use "DRY_RUN" during testing if you don't want to block yet
+      interval: 60, // seconds
+      max: 20, // max requests per interval
+      // identifier: (ctx) => ctx.ip, // rate-limit key (not supported)
+    }),
+  ],
 });
 
-// Don't match static assets; do NOT include /sign-in or /sign-up here
+export default clerkMiddleware(async (auth, req) => {
+  // 3) Arcjet: evaluate request first
+  const decision = await aj.protect(req);
+  if (decision.isDenied()) {
+    // You can inspect decision.reason if you want to log the cause
+    return new Response('Blocked by Arcjet', { status: 429 });
+  }
+
+  // 4) Clerk: protect only the routes that should require auth
+  if (isProtectedRoute(req)) {
+    await auth.protect();
+  }
+
+  // 5) Continue normally
+  return NextResponse.next();
+});
+
+// 6) Don't match static assets; do NOT gate auth pages here
 export const config = {
   matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
 };
