@@ -20,9 +20,11 @@
     "@arcjet/inspect": "1.0.0-beta.10",
     "@arcjet/next": "1.0.0-beta.10",
     "@clerk/nextjs": "^6.31.6",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "next": "15.5.1-canary.9",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

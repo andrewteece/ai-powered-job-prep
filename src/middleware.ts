@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import arcjet, { shield, slidingWindow /* or tokenBucket */ } from '@arcjet/next';
+import { env } from './data/env/server';
 
 // 1) Define which routes require authentication
 const isProtectedRoute = createRouteMatcher([
@@ -13,7 +14,7 @@ const isProtectedRoute = createRouteMatcher([
 
 // 2) Single Arcjet client (created once per edge runtime boot)
 const aj = arcjet({
-  key: process.env.ARCJET_KEY!,
+  key: env.ARCJET_KEY!,
   rules: [
     // Basic security checks (WAF-like)
     shield({ mode: 'LIVE' }),
