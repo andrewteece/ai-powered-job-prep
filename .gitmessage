@@ -1,0 +1,39 @@
+# .gitmessage
+
+# Commit message template
+
+# ------------------------
+
+# <type>(<scope>): <short summary>
+
+#
+
+# Types: feat, fix, chore, docs, style, refactor, test, ci
+
+# Scope: optional (e.g., ui, auth, db)
+
+#
+
+# Examples:
+
+# feat(dashboard): add drag-and-drop for tasks
+
+# fix(api): correct response code for unauthorized
+
+# style(theme): update globals.css with tweakcn theme
+
+# chore(env): adjust env schema in server.ts
+
+#
+
+# Body (optional):
+
+# - More detail about _why_ the change was made
+
+# - Reference any issues (Fixes #123)
+
+#
+
+# Footer (optional):
+
+# BREAKING CHANGE: describe here
