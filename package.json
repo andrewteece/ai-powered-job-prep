@@ -15,9 +15,9 @@
     "test:cov": "vitest --coverage",
     "prepare": "husky",
     "format": "prettier --write .",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
+    "db:generate": "DOTENV_CONFIG_PATH=.env.local drizzle-kit generate",
+    "db:migrate": "DOTENV_CONFIG_PATH=.env.local drizzle-kit migrate",
+    "db:studio": "DOTENV_CONFIG_PATH=.env.local drizzle-kit studio",
     "db:push": "pnpm db:generate && pnpm db:migrate"
   },
   "dependencies": {
