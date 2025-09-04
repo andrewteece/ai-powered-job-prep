@@ -1,65 +1,53 @@
 'use client';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-
-const themes = [
-  {
-    name: 'Light',
-    Icon: Sun,
-    value: 'light',
-  },
-  {
-    name: 'Dark',
-    Icon: Moon,
-    value: 'dark',
-  },
-  {
-    name: 'System',
-    Icon: Monitor,
-    value: 'system',
-  },
-] as const;
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import * as React from 'react';
 
 export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const { setTheme, theme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme, theme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  // Avoid SSR/CSR mismatch: only render after mount
+  React.useEffect(() => setMounted(true), []);
   if (!mounted) return null;
+
+  const CurrentIcon = resolvedTheme === 'dark' ? Moon : resolvedTheme === 'light' ? Sun : Monitor;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          {resolvedTheme === 'dark' ? <Moon /> : <Sun />}
-          <span className="sr-only">Toggle theme</span>
+        <Button variant="ghost" size="icon" aria-label="Toggle theme">
+          <CurrentIcon className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {themes.map(({ name, Icon, value }) => (
-          <DropdownMenuItem
-            key={value}
-            onClick={() => setTheme(value)}
-            className={cn('cursor-pointer', theme === value && 'bg-accent text-accent-foreground')}
-          >
-            <Icon className="size-4" />
-            {name}
-          </DropdownMenuItem>
-        ))}
+
+      <DropdownMenuContent align="end" sideOffset={6}>
+        <DropdownMenuRadioGroup
+          value={theme ?? 'system'}
+          onValueChange={(v) => setTheme(v as 'light' | 'dark' | 'system')}
+        >
+          <DropdownMenuRadioItem value="light" className="cursor-pointer">
+            <Sun className="mr-2 h-4 w-4" />
+            Light
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark" className="cursor-pointer">
+            <Moon className="mr-2 h-4 w-4" />
+            Dark
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system" className="cursor-pointer">
+            <Monitor className="mr-2 h-4 w-4" />
+            System
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
