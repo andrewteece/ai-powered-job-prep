@@ -26,6 +26,7 @@ jobs:
       DB_NAME: ${{ secrets.DB_NAME }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       ARCJET_KEY: ${{ secrets.ARCJET_KEY }}
+      CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
 
     steps:
       - name: Checkout
